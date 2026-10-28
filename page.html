@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AntiDDoS</title>
+<style>
+:root{color-scheme:dark;--bg:#050816;--pn:rgba(18,26,52,.74);--ln:rgba(120,140,220,.17);--tx:#e8edff;--mu:#8e9bc4;--ac:#5b8cff;--ac2:#8b5cf6;--ok:#34d399;--wa:#fbbf24;--er:#f87171;--in:#0b1230}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;color:var(--tx);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+background:radial-gradient(900px 500px at 12% -10%,rgba(91,140,255,.22),transparent 60%),radial-gradient(700px 500px at 100% 0,rgba(139,92,246,.18),transparent 60%),var(--bg);
+display:flex;flex-direction:column;align-items:center;padding:28px 16px 60px}
+.top{width:min(100%,1000px);display:flex;align-items:center;justify-content:space-between;margin-bottom:28px}
+.brand{display:flex;align-items:center;gap:12px;font-weight:700;font-size:18px;letter-spacing:.2px}
+.logo{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(135deg,var(--ac),var(--ac2));box-shadow:0 8px 24px rgba(91,140,255,.4)}
+.pill{font-size:12px;color:var(--mu);border:1px solid var(--ln);border-radius:99px;padding:5px 12px;background:rgba(255,255,255,.03)}
+.pill i{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--ok);margin-right:7px;box-shadow:0 0 8px var(--ok)}
+.card{background:var(--pn);backdrop-filter:blur(16px);border:1px solid var(--ln);border-radius:20px;padding:26px;box-shadow:0 24px 60px rgba(0,0,0,.45)}
+.narrow{width:min(100%,440px);margin-top:4vh}.wide{width:min(100%,1000px);display:grid;gap:18px}
+h1{margin:0 0 6px;font-size:24px;letter-spacing:-.3px}h2{margin:0 0 14px;font-size:15px;color:var(--mu);font-weight:600;text-transform:uppercase;letter-spacing:.8px}
+p{margin:0}.mu{color:var(--mu);font-size:14px}
+label.f{display:block;margin:16px 0 6px;font-size:13px;color:var(--mu);font-weight:600}
+input[type=text],input[type=password],input.in{width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--ln);background:var(--in);color:var(--tx);font:inherit;outline:0;transition:.15s}
+input:focus{border-color:var(--ac);box-shadow:0 0 0 4px rgba(91,140,255,.18)}
+.mono{font-family:ui-monospace,Consolas,monospace}
+.btn{border:0;border-radius:12px;padding:12px 18px;font-weight:600;font-size:14px;font-family:inherit;color:#fff;cursor:pointer;transition:.15s;background:linear-gradient(135deg,var(--ac),var(--ac2));box-shadow:0 8px 22px rgba(91,140,255,.32)}
+.btn:hover{transform:translateY(-1px);filter:brightness(1.1)}.btn.block{width:100%;margin-top:20px}
+.btn.gh{background:rgba(255,255,255,.06);box-shadow:none;border:1px solid var(--ln)}.btn.dg{background:rgba(248,113,113,.14);color:var(--er);box-shadow:none;border:1px solid rgba(248,113,113,.3)}
+.btn.sm{padding:6px 11px;font-size:12px;border-radius:9px;box-shadow:none}
+.sw{display:flex;align-items:center;gap:11px;margin-top:16px;cursor:pointer;color:var(--mu);font-size:14px;user-select:none}
+.sw input{display:none}.sw b{width:42px;height:24px;border-radius:99px;background:#22305c;position:relative;transition:.2s;flex:none}
+.sw b:after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:.2s}
+.sw input:checked+b{background:var(--ok)}.sw input:checked+b:after{left:21px}
+.err{color:var(--er);font-size:13px;min-height:18px;margin-top:12px}
+.hero{text-align:center}.ring{width:84px;height:84px;margin:4px auto 16px;border-radius:50%;display:grid;place-items:center;font-size:38px}
+.ring.ok{background:rgba(52,211,153,.12);box-shadow:0 0 0 8px rgba(52,211,153,.07),0 0 40px rgba(52,211,153,.25)}
+.ring.wa{background:rgba(251,191,36,.12);box-shadow:0 0 0 8px rgba(251,191,36,.07)}
+.ipbox{margin:18px 0;padding:14px;border-radius:14px;background:var(--in);border:1px solid var(--ln);font-size:20px;letter-spacing:.5px}
+.list{text-align:left;margin-top:14px;display:grid;gap:9px}.list div{display:flex;gap:10px;color:var(--mu);font-size:14px}.list span{color:var(--ok)}
+.foot{margin-top:22px;text-align:center;font-size:13px}a{color:#8fb0ff;cursor:pointer;text-decoration:none}a:hover{text-decoration:underline}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px}
+.stat{padding:18px 20px}.stat b{display:block;font-size:30px;line-height:1.1;margin-top:4px}.stat small{color:var(--mu);font-size:12px;text-transform:uppercase;letter-spacing:.8px}
+.bar{display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:16px}.bar .sw{margin:0}
+.bar input.in{max-width:280px}.tw{overflow-x:auto;margin:0 -8px}
+table{width:100%;border-collapse:collapse;min-width:640px}th{text-align:left;font-size:11px;color:var(--mu);text-transform:uppercase;letter-spacing:.8px;padding:8px}
+td{padding:11px 8px;border-top:1px solid var(--ln);font-size:14px;vertical-align:middle}tr:hover td{background:rgba(255,255,255,.02)}
+.u{display:flex;align-items:center;gap:10px;font-weight:600}.av{width:32px;height:32px;border-radius:10px;display:grid;place-items:center;font-size:13px;font-weight:700;color:#fff}
+.b{display:inline-block;font-size:12px;font-weight:600;padding:3px 10px;border-radius:99px}
+.b.ok{background:rgba(52,211,153,.14);color:var(--ok)}.b.wa{background:rgba(251,191,36,.14);color:var(--wa)}.b.er{background:rgba(248,113,113,.14);color:var(--er)}.b.mu{background:rgba(142,155,196,.14);color:var(--mu)}
+.acts{display:flex;gap:6px;flex-wrap:wrap}.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px}
+.row{display:flex;gap:8px}.row input{flex:1}.log{max-height:230px;overflow:auto;display:grid;gap:2px;font-size:13px}
+.log div{display:flex;gap:12px;padding:6px 8px;border-radius:8px;color:var(--mu)}.log div:nth-child(odd){background:rgba(255,255,255,.025)}.log span{color:#6f7fb0;white-space:nowrap}
+.empty{text-align:center;padding:30px;color:var(--mu)}
+.lv{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.opt{padding:14px 16px;border-radius:14px;border:1px solid var(--ln);background:var(--in);cursor:pointer;transition:.15s}.opt:hover{border-color:var(--ac)}
+.opt b{display:block;margin-bottom:3px}.opt span{color:var(--mu);font-size:13px}.opt.on{border-color:var(--ac);background:rgba(91,140,255,.14);box-shadow:0 0 0 3px rgba(91,140,255,.15)}
+.list2{margin-top:16px;display:grid;gap:8px;max-height:260px;overflow:auto}.li{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:12px;background:var(--in);border:1px solid var(--ln)}
+.li span{flex:none}.li i{flex:1;color:var(--mu);font-size:13px;font-style:normal;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.banner{padding:12px 16px;border-radius:14px;background:rgba(91,140,255,.12);border:1px solid rgba(91,140,255,.3);font-size:14px}
+.banner.red{background:rgba(248,113,113,.12);border-color:rgba(248,113,113,.4);color:var(--er);font-weight:600}
+.spark{display:flex;align-items:flex-end;gap:2px;height:90px}.spark i{flex:1;min-width:2px;border-radius:3px 3px 0 0;background:linear-gradient(180deg,var(--ac),var(--ac2))}
+.sub{margin:16px 0 8px;font-size:12px;color:var(--mu);text-transform:uppercase;letter-spacing:.8px}
+#toast{position:fixed;bottom:22px;left:50%;transform:translate(-50%,90px);background:#141c3d;border:1px solid var(--ln);padding:11px 18px;border-radius:12px;opacity:0;transition:.3s;box-shadow:0 12px 40px rgba(0,0,0,.5);z-index:9}
+#toast.on{transform:translate(-50%,0);opacity:1}
+</style></head><body>
+<div class="top"><div class="brand"><div class="logo"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 4.5-3.2 8-8 9-4.8-1-8-4.5-8-9V6z"/><path d="M9 12l2 2 4-4"/></svg></div>AntiDDoS</div><div class="pill"><i></i>Protection active</div></div>
+<div id="app"></div><div id="toast"></div>
+<script>
+/*API*/
+const api=async(p,b)=>{const r=await fetch(p,{method:b?'POST':'GET',headers:{'X-Req':'1','Content-Type':'application/json'},body:b?JSON.stringify(b):undefined});
+ const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error||'Erreur');return j};
+/*/API*/
+const A=document.getElementById('app'),T=document.getElementById('toast');let tt;
+const h=(t,p={},...k)=>{const e=document.createElement(t);for(const[a,v]of Object.entries(p)){if(a=='class')e.className=v;else if(a=='text')e.textContent=v;else if(a in e)e[a]=v;else e.setAttribute(a,v)}e.append(...k.flat().filter(x=>x!=null&&x!==false));return e};
+const toast=(m)=>{T.textContent=m;T.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>T.classList.remove('on'),2600)};
+const ago=s=>{const d=Date.now()/1e3-s;return d<60?"à l'instant":d<3600?Math.floor(d/60)+' min':d<86400?Math.floor(d/3600)+' h':Math.floor(d/86400)+' j'};
+const show=(...k)=>A.replaceChildren(...k);
+const sw=(txt,on,fn)=>{const c=h('input',{type:'checkbox',checked:on,onchange:()=>fn(c.checked)});return h('label',{class:'sw'},c,h('b'),txt)};
+const col=n=>{let x=0;for(const c of n)x=(x*31+c.charCodeAt(0))%360;return`hsl(${x} 60% 50%)`};
+
+async function user(){
+ const me=await api('/api/me');
+ if(me.user){const u=me.user,ok=u.status=='approved';
+  if(ok)return panel(u);
+  return show(h('div',{class:'card narrow hero'},h('div',{class:'ring '+(ok?'ok':'wa'),text:ok?'✓':'⏳'}),
+   h('h1',{text:ok?'Tu es protégé':'En attente de validation'}),
+   h('p',{class:'mu',text:ok?'Ton IP est enregistrée et protégée.':'Un administrateur doit valider ton accès.'}),
+   h('div',{class:'ipbox mono',text:u.ip}),
+   h('div',{class:'list'},h('div',{},h('span',{text:'●'}),'Connexion automatique à chaque visite'),h('div',{},h('span',{text:'●'}),'Ton IP se met à jour toute seule si elle change'),h('div',{},h('span',{text:'●'}),'Sans visite pendant 7 jours, il faudra la remettre')),
+   h('button',{class:'btn gh block',text:'Se déconnecter',onclick:async()=>{await api('/api/logout',{});user()}}),
+   h('div',{class:'foot'},h('a',{text:'Espace admin',onclick:admin}))))}
+ const p=h('input',{type:'text',placeholder:'Ton pseudo',maxLength:24,autocomplete:'off'}),i=h('input',{type:'text',class:'mono',value:me.ip}),m=h('div',{class:'err'});let rem=true;
+ const go=async()=>{try{await api('/api/login',{pseudo:p.value,ip:i.value,remember:rem});user()}catch(e){m.textContent=e.message}};
+ p.onkeydown=i.onkeydown=e=>e.key=='Enter'&&go();
+ show(h('div',{class:'card narrow'},h('h1',{text:'Connexion'}),h('p',{class:'mu',text:'Entre ton IP pour être protégé automatiquement.'}),
+  h('label',{class:'f',text:'Pseudo'}),p,h('label',{class:'f',text:'Ton adresse IP (détectée automatiquement)'}),i,
+  sw('Se souvenir de moi (7 jours)',true,v=>rem=v),m,h('button',{class:'btn block',text:'Se connecter',onclick:go}),
+  h('div',{class:'foot'},h('a',{text:'Espace admin',onclick:admin}))))}
+
+const LV=[['Normal','Limites standard, idéal au quotidien.'],['Renforcé','Limites réduites de 40 % et bans 2 fois plus longs.'],['Maximum','Limites réduites de 65 % et bans 4 fois plus longs : pendant une attaque.']];
+function panel(u){
+ const rep=u.rep,on=rep&&Date.now()/1e3-rep.t<120,bans=u.bans||[],lv=u.level||0,tr=u.trust||[],hist=(rep&&rep.hist)||[],mx=Math.max(1,...hist);
+ const pa=async(b,msg)=>{try{await api('/api/panel',b);msg&&toast(msg)}catch(e){toast(e.message)}user()};
+ const stat=(l,v,c)=>h('div',{class:'card stat'},h('small',{text:l}),h('b',{text:v,style:c?'color:'+c:''}));
+ const ip=h('input',{class:'in mono',placeholder:'IP ou réseau (ex. 203.0.113.0/24)'}),nt=h('input',{class:'in',placeholder:'Note (facultatif)',maxLength:40,style:'margin-top:10px'}),ti=h('input',{class:'in mono',placeholder:'IP de confiance (jamais bannie)'});
+ const add=()=>pa({action:'ban',ip:ip.value,note:nt.value},'Banni');ip.onkeydown=nt.onkeydown=e=>e.key=='Enter'&&add();ti.onkeydown=e=>e.key=='Enter'&&pa({action:'trust',ip:ti.value},'IP de confiance ajoutée');
+ const k=h('input',{class:'in mono',readOnly:true,placeholder:u.haskey?'Clé déjà générée (non affichable)':'Aucune clé pour le moment'});
+ const li=(x,note,b)=>h('div',{class:'li'},h('span',{class:'mono',text:x}),h('i',{text:note}),b);
+ const none=t=>h('p',{class:'mu',text:t});
+ show(h('div',{class:'wide'},
+  h('div',{class:'bar'},h('div',{},h('h1',{text:'Mon panel'}),h('p',{class:'mu'},'Tu es protégé · ',h('span',{class:'mono',text:u.ip}))),
+   h('div',{class:'acts'},h('span',{class:'b '+(on?'ok':'mu'),text:on?'● Appli connectée':'○ Appli non connectée'}),h('button',{class:'btn gh sm',text:'Actualiser',onclick:user}),
+    h('button',{class:'btn gh sm',text:'Se déconnecter',onclick:async()=>{await api('/api/logout',{});user()}}))),
+  u.notice&&h('div',{class:'banner',text:'📢 '+u.notice}),on&&rep.attack&&h('div',{class:'banner red',text:'⚠️ Attaque en cours : ta protection est automatiquement renforcée.'}),
+  u.minlevel>0&&h('div',{class:'banner',text:'🔒 Un administrateur impose au moins le niveau « '+LV[u.minlevel][0]+' » à tout le monde.'}),
+  h('div',{class:'stats'},stat('Niveau',LV[lv][0],['','var(--wa)','var(--er)'][lv]),stat('Connexions',rep?rep.conns:'—'),stat('Bans automatiques',rep?rep.total:'—'),stat('IP bannies par moi',bans.length),stat('Mode attaque',rep?(rep.attack?'ACTIF':'Non'):'—',rep&&rep.attack?'var(--er)':'')),
+  h('div',{class:'card'},h('h2',{text:'Niveau de protection'}),h('div',{class:'lv'},LV.map((x,i)=>h('div',{class:'opt'+(lv==i?' on':''),onclick:()=>pa({action:'level',level:i},'Niveau : '+x[0])},h('b',{text:x[0]}),h('span',{text:x[1]}))))),
+  h('div',{class:'card'},h('h2',{text:'Trafic en direct (60 dernières secondes)'}),
+   hist.length?h('div',{class:'spark'},hist.map(v=>h('i',{style:'height:'+Math.max(3,v/mx*100)+'%',title:v+' connexions'}))):none('Connecte ton appli pour voir ton trafic en direct.'),
+   rep&&h('div',{class:'acts',style:'margin-top:14px'},h('span',{class:'b ok',text:rep.conns+' connexions'}),h('span',{class:'b wa',text:rep.syn+' SYN'}),Object.entries(rep.kinds||{}).map(([n,v])=>h('span',{class:'b er',text:n+' : '+v})))),
+  h('div',{class:'two'},
+   h('div',{class:'card'},h('h2',{text:'Bannir une IP ou un réseau'}),ip,nt,h('button',{class:'btn block',text:'Bannir',onclick:add}),
+    h('div',{class:'list2'},bans.length?bans.map(x=>li(x.ip,x.note||'',h('button',{class:'btn sm gh',text:'Retirer',onclick:()=>pa({action:'unban',ip:x.ip},'Débanni')}))):none('Aucun ban manuel pour le moment.')),
+    bans.length>0&&h('button',{class:'btn gh sm',style:'margin-top:12px',text:'Copier la liste',onclick:()=>{navigator.clipboard&&navigator.clipboard.writeText(bans.map(x=>x.ip).join('\n'));toast('Liste copiée')}})),
+   h('div',{class:'card'},h('h2',{text:'Activité de mon appli'}),
+    h('div',{class:'sub',text:'Plus gros consommateurs'}),h('div',{class:'list2'},rep&&rep.top&&rep.top.length?rep.top.map(x=>li(x.ip,x.n+' connexions',h('button',{class:'btn sm dg',text:'Bannir',onclick:()=>pa({action:'ban',ip:x.ip,note:'top'},'Banni')}))):none(rep?'Rien d’anormal.':'Appli non connectée.')),
+    h('div',{class:'sub',text:'Bloquées automatiquement'}),h('div',{class:'list2'},rep&&rep.banned.length?rep.banned.map(x=>li(x.ip,'encore '+Math.ceil(x.left/60)+' min',h('button',{class:'btn sm dg',text:'Pour de bon',onclick:()=>pa({action:'ban',ip:x.ip,note:'auto'},'Banni')}))):none('Aucune IP bloquée.')))),
+  h('div',{class:'two'},
+   h('div',{class:'card'},h('h2',{text:'IP de confiance'}),h('p',{class:'mu',text:'Ces IP (amis, serveurs, ton téléphone) ne seront jamais bannies par ton appli.'}),h('div',{class:'row',style:'margin-top:12px'},ti,h('button',{class:'btn',text:'Ajouter',onclick:()=>pa({action:'trust',ip:ti.value},'IP de confiance ajoutée')})),
+    h('div',{class:'list2'},tr.length?tr.map(x=>li(x,'',h('button',{class:'btn sm gh',text:'Retirer',onclick:()=>pa({action:'untrust',ip:x},'Retirée')}))):none('Aucune IP de confiance.'))),
+   h('div',{class:'card'},h('h2',{text:'Mon historique'}),h('div',{class:'log'},(u.ulog||[]).length?u.ulog.slice(0,12).map(l=>h('div',{},h('span',{text:l.t}),l.msg)):none('Rien pour le moment.')))),
+  h('div',{class:'card'},h('h2',{text:'Connecter mon appli Windows'}),h('p',{class:'mu',text:'Génère ta clé, puis mets-la dans config.json (site_key) avec l’adresse de ce site (site_url). Ton appli applique alors ton niveau, tes bans et tes IP de confiance, et envoie son activité ici.'}),
+   h('div',{class:'row',style:'margin-top:12px'},k,h('button',{class:'btn',text:u.haskey?'Régénérer':'Générer ma clé',onclick:async()=>{try{const r=await api('/api/panel',{action:'key'});k.value=r.key;toast('Copie ta clé : elle ne sera plus affichée')}catch(e){toast(e.message)}}}),
+    h('button',{class:'btn gh',text:'Copier',onclick:()=>{k.value&&navigator.clipboard&&navigator.clipboard.writeText(k.value);toast(k.value?'Clé copiée':'Génère d’abord une clé')}})))))}
+async function admin(){
+ let d;try{d=await api('/api/admin/data')}catch(e){
+  const p=h('input',{type:'password',placeholder:'••••••••••'}),m=h('div',{class:'err'});
+  const go=async()=>{try{await api('/api/admin/login',{password:p.value});admin()}catch(e){m.textContent=e.message}};p.onkeydown=e=>e.key=='Enter'&&go();
+  return show(h('div',{class:'card narrow'},h('h1',{text:'Espace admin'}),h('p',{class:'mu',text:'Accès réservé.'}),h('label',{class:'f',text:'Mot de passe'}),p,m,
+   h('button',{class:'btn block',text:'Entrer',onclick:go}),h('div',{class:'foot'},h('a',{text:'← Retour',onclick:user}))))}
+ const now=Date.now()/1e3,us=Object.entries(d.users);
+ const st=u=>u.banned?['er','Banni']:u.status!='approved'?['wa','En attente']:now-u.seen>604800?['mu','Expiré']:['ok','Protégé'];
+ const act=async(id,a,x)=>{try{await api('/api/admin/act',{id,action:a,ip:x});toast('Fait ✓')}catch(e){toast(e.message)}admin()};
+ const stat=(l,v,c)=>h('div',{class:'card stat'},h('small',{text:l}),h('b',{text:v,style:c?'color:'+c:''}));
+ const tb=h('tbody');
+ const draw=q=>{tb.replaceChildren();const f=us.filter(([,u])=>(u.name+u.ip).toLowerCase().includes(q.toLowerCase()));
+  if(!f.length)tb.append(h('tr',{},h('td',{colSpan:7,class:'empty',text:'Aucun utilisateur'})));
+  f.forEach(([id,u])=>{const[c,t]=st(u),b=(tx,cl,fn)=>h('button',{class:'btn sm '+cl,text:tx,onclick:fn});
+   tb.append(h('tr',{},h('td',{},h('div',{class:'u'},h('div',{class:'av',text:u.name[0].toUpperCase(),style:'background:'+col(u.name)}),u.name)),
+    h('td',{class:'mono',text:u.ip}),h('td',{},h('span',{class:'b '+c,text:t})),h('td',{class:'mu',text:LV[u.level||0][0]+' · '+u.nb+' ban'+(u.nb>1?'s':'')}),h('td',{},h('span',{class:'b '+(u.online?(u.attack?'er':'ok'):'mu'),text:u.online?(u.attack?'Attaque':'En ligne'):'Hors ligne'})),h('td',{class:'mu',text:ago(u.seen)}),
+    h('td',{},h('div',{class:'acts'},u.status!='approved'&&b('Valider','',()=>act(id,'approve')),
+     b(u.banned?'Débannir':'Bannir',u.banned?'gh':'dg',()=>act(id,u.banned?'unban':'ban')),
+     b('Changer IP','gh',()=>{const x=prompt('Nouvelle IP pour '+u.name,u.ip);x&&act(id,'setip',x)}),
+     b('Déconnecter','gh',()=>act(id,'revoke')),b('Supprimer','dg',()=>confirm('Supprimer '+u.name+' ?')&&act(id,'delete'))))))})};
+ const q=h('input',{class:'in',placeholder:'Rechercher un pseudo ou une IP…',oninput:()=>draw(q.value)});draw('');
+ const o=h('input',{type:'password',class:'in',placeholder:'Ancien mot de passe'}),n=h('input',{type:'password',class:'in',placeholder:'Nouveau (10 caractères min.)',style:'margin-top:10px'});
+ const call=(b,m)=>api('/api/admin/act',b).then(()=>{toast(m||'Fait ✓');admin()}).catch(e=>toast(e.message));
+ const nt=h('input',{class:'in',placeholder:'Message pour tous les utilisateurs (vide = aucun)',maxLength:200,value:d.notice||''}),gi=h('input',{class:'in mono',placeholder:'IP ou réseau à bannir pour tout le monde'});
+ const csv=()=>{const t='pseudo;ip;etat;niveau;derniere_visite\n'+us.map(([,u])=>[u.name,u.ip,st(u)[1],LV[u.level||0][0],new Date(u.seen*1e3).toISOString()].join(';')).join('\n');h('a',{href:URL.createObjectURL(new Blob([t],{type:'text/csv'})),download:'utilisateurs.csv'}).click()};
+ show(h('div',{class:'wide'},
+  h('div',{class:'bar'},h('div',{},h('h1',{text:'Espace admin'}),h('p',{class:'mu',text:'Gère les utilisateurs et la protection.'})),
+   h('div',{class:'acts'},h('button',{class:'btn gh sm',text:'Actualiser',onclick:admin}),h('button',{class:'btn gh sm',text:'Quitter',onclick:async()=>{await api('/api/admin/logout',{});user()}}))),
+  h('div',{class:'stats'},stat('Utilisateurs',us.length),stat('Protégés',d.active,'var(--ok)'),stat('En attente',us.filter(([,u])=>u.status!='approved'&&!u.banned).length,'var(--wa)'),stat('Bannis',us.filter(([,u])=>u.banned).length,'var(--er)'),stat('Applis en ligne',d.online,'var(--ok)'),stat('Attaques en cours',d.attacks,d.attacks?'var(--er)':''),stat('Bans automatiques',d.bans)),
+  h('div',{class:'card'},h('div',{class:'bar'},q,sw('Validation manuelle des nouveaux',d.approval,v=>api('/api/admin/act',{action:'approval',ip:v?'1':''}).then(()=>toast('Réglage enregistré')))),
+   h('div',{class:'tw'},h('table',{},h('thead',{},h('tr',{},...['Utilisateur','IP','État','Niveau','Appli','Dernière visite','Actions'].map(x=>h('th',{text:x})))),tb))),
+  h('div',{class:'two'},
+   h('div',{class:'card'},h('h2',{text:'Centre de contrôle'}),h('p',{class:'mu',text:'Niveau minimum imposé à toutes les applis (mode crise) :'}),
+    h('div',{class:'lv',style:'margin:10px 0 16px'},LV.map((x,i)=>h('div',{class:'opt'+((d.minlevel||0)==i?' on':''),onclick:()=>call({action:'minlevel',ip:i},'Niveau minimum : '+x[0])},h('b',{text:x[0]})))),
+    nt,h('div',{class:'acts',style:'margin-top:10px'},h('button',{class:'btn sm',text:'Publier le message',onclick:()=>call({action:'notice',ip:nt.value},'Message publié')}),
+     h('button',{class:'btn sm gh',text:'Tout valider',onclick:()=>call({action:'approve_all'})}),h('button',{class:'btn sm gh',text:'Purger inactifs (30 j)',onclick:()=>confirm('Supprimer les comptes inactifs depuis 30 jours ?')&&call({action:'purge'})}),h('button',{class:'btn sm gh',text:'Exporter CSV',onclick:csv}))),
+   h('div',{class:'card'},h('h2',{text:'Bans globaux (toutes les applis)'}),h('div',{class:'row'},gi,h('button',{class:'btn',text:'Bannir',onclick:()=>call({action:'gban',ip:gi.value},'Ban global ajouté')})),
+    h('div',{class:'list2'},d.gbans.length?d.gbans.map(x=>h('div',{class:'li'},h('span',{class:'mono',text:x}),h('i'),h('button',{class:'btn sm gh',text:'Retirer',onclick:()=>call({action:'gunban',ip:x})}))):h('p',{class:'mu',text:'Aucun ban global.'}))),
+   h('div',{class:'card'},h('h2',{text:'Mot de passe admin'}),o,n,h('button',{class:'btn block',text:'Changer',onclick:async()=>{try{await api('/api/admin/password',{old:o.value,new:n.value});toast('Mot de passe changé')}catch(e){toast(e.message)}}}))),
+  h('div',{class:'card'},h('h2',{text:'Journal'}),h('div',{class:'log'},d.log.slice(0,60).map(l=>h('div',{},h('span',{text:l.t}),l.msg))))))}
+user();
+</script></body></html>

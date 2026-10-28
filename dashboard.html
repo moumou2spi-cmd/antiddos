@@ -1,0 +1,390 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AntiDDoS</title>
+<style>
+:root{--bg:#dde6f4;--panel:rgba(255,255,255,.5);--panel2:rgba(110,128,168,.14);--line:rgba(24,36,70,.1);--hi:rgba(255,255,255,.8);--tx:#0c1424;--mu:#4d5d78;--ac:#6366f1;--ac2:#22b8e0;--ok:#0c9564;--warn:#b86f00;--bad:#d62a47;--o1:rgba(99,102,241,.38);--o2:rgba(34,184,224,.34);--o3:rgba(244,114,182,.24);--sh:0 8px 32px rgba(30,45,90,.12);color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#060a15;--panel:rgba(18,27,50,.5);--panel2:rgba(150,168,215,.1);--line:rgba(255,255,255,.09);--hi:rgba(255,255,255,.08);--tx:#e8eefc;--mu:#9badcf;--ok:#3ddc97;--warn:#f5b73b;--bad:#ff6b82;--o1:rgba(99,102,241,.4);--o2:rgba(34,184,224,.26);--o3:rgba(244,114,182,.16);--sh:0 10px 40px rgba(0,0,0,.45);color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#060a15;--panel:rgba(18,27,50,.5);--panel2:rgba(150,168,215,.1);--line:rgba(255,255,255,.09);--hi:rgba(255,255,255,.08);--tx:#e8eefc;--mu:#9badcf;--ok:#3ddc97;--warn:#f5b73b;--bad:#ff6b82;--o1:rgba(99,102,241,.4);--o2:rgba(34,184,224,.26);--o3:rgba(244,114,182,.16);--sh:0 10px 40px rgba(0,0,0,.45);color-scheme:dark}
+:root[data-accent="cyan"]{--ac:#0ea5c6;--ac2:#6366f1;--o1:rgba(14,165,198,.36);--o2:rgba(99,102,241,.3)}
+:root[data-accent="emerald"]{--ac:#10b981;--ac2:#06b6d4;--o1:rgba(16,185,129,.34);--o2:rgba(6,182,212,.28)}
+:root[data-accent="rose"]{--ac:#f43f5e;--ac2:#f59e0b;--o1:rgba(244,63,94,.32);--o2:rgba(245,158,11,.26)}
+html{background:var(--bg);scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:transparent;color:var(--tx);font:14px/1.5 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-variant-numeric:tabular-nums}
+body::before{content:"";position:fixed;inset:0;z-index:-1;background:radial-gradient(620px 440px at 10% 6%,var(--o1),transparent 70%),radial-gradient(580px 440px at 90% 16%,var(--o2),transparent 70%),radial-gradient(660px 500px at 58% 100%,var(--o3),transparent 70%)}
+button,input{font:inherit;color:inherit}
+.app{display:grid;grid-template-columns:248px minmax(0,1fr);min-height:100vh;padding:14px;gap:6px}
+.side,.card,.pill,.banner{background:var(--panel);backdrop-filter:blur(24px) saturate(1.6);-webkit-backdrop-filter:blur(24px) saturate(1.6);border:1px solid var(--line);box-shadow:var(--sh),inset 0 1px 0 var(--hi)}
+.side{position:sticky;top:14px;align-self:start;height:calc(100vh - 28px);border-radius:26px;padding:20px 12px;display:flex;flex-direction:column;gap:4px}
+.logo{display:flex;align-items:center;gap:11px;font-size:18px;font-weight:700;letter-spacing:-.02em;padding:0 10px 20px}
+.logo i{width:38px;height:38px;border-radius:12px;background:linear-gradient(140deg,var(--ac),var(--ac2));display:grid;place-items:center;color:#fff;box-shadow:0 6px 18px color-mix(in srgb,var(--ac) 45%,transparent)}
+.nav{display:flex;align-items:center;gap:12px;padding:10px 12px;border:1px solid transparent;background:none;border-radius:14px;color:var(--mu);cursor:pointer;text-align:left;width:100%;transition:background .15s,color .15s}
+.nav:hover{background:var(--panel2);color:var(--tx)}
+.nav.on{background:var(--panel2);border-color:var(--line);color:var(--tx);font-weight:600}
+.nav.on svg{color:var(--ac)}
+.nav svg,.btn svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.nav b{margin-left:auto;background:var(--bad);color:#fff;border-radius:99px;font-size:11px;padding:0 7px;font-weight:600}
+.sp{flex:1}
+.foot{font-size:12px;color:var(--mu);padding:12px 10px 2px;border-top:1px solid var(--line)}
+main{padding:14px 22px 40px;min-width:0;max-width:1260px;width:100%}
+.banner{border-left:3px solid var(--warn);border-radius:14px;padding:10px 14px;margin-bottom:18px;color:var(--mu)}
+.head{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;margin-bottom:22px;flex-wrap:wrap}
+h1{font-size:28px;letter-spacing:-.035em;margin:0;line-height:1.15}
+h2{font-size:15px;margin:0;font-weight:600}
+.mu{color:var(--mu)}
+.actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.pill{display:inline-flex;align-items:center;gap:8px;padding:7px 14px;border-radius:99px;font-weight:600;font-size:13px}
+.pill::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 4px color-mix(in srgb,var(--ok) 22%,transparent)}
+.pill.warn::before{background:var(--warn);box-shadow:0 0 0 4px color-mix(in srgb,var(--warn) 22%,transparent)}
+.pill.bad{border-color:var(--bad);color:var(--bad)}
+.pill.bad::before{background:var(--bad);box-shadow:0 0 0 4px color-mix(in srgb,var(--bad) 25%,transparent);animation:pulse 1.2s infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 8px transparent}}
+@media (prefers-reduced-motion:reduce){.pill.bad::before{animation:none}.toast{animation:none}}
+.btn{display:inline-flex;align-items:center;gap:8px;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:7px 13px;cursor:pointer;transition:border-color .15s,transform .1s,background .15s}
+.btn:hover{border-color:var(--ac)}.btn:active{transform:scale(.97)}
+.btn.pri{background:var(--ac);border-color:var(--ac);color:#fff;font-weight:600}
+.btn.sm{padding:4px 11px;font-size:13px}
+:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+.view{display:none}.view.on{display:block}
+.card{border-radius:24px;padding:18px 20px;min-width:0}
+.grid{display:grid;gap:16px;margin-bottom:16px}
+.hero{grid-template-columns:minmax(300px,1.1fr) minmax(0,2fr)}
+.two{grid-template-columns:repeat(auto-fit,minmax(340px,1fr))}
+.threat{display:flex;gap:22px;align-items:center;background:linear-gradient(150deg,color-mix(in srgb,var(--lvl,var(--ok)) 18%,var(--panel)),var(--panel) 75%)}
+.threat svg{width:136px;height:136px;flex:none}
+#ring{filter:drop-shadow(0 0 7px var(--lvl,var(--ok)))}
+.threat .big{font-size:26px;font-weight:700;letter-spacing:-.02em;color:var(--lvl,var(--ok))}
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:16px}
+.m{border-radius:20px;padding:14px 16px}
+.m .v{font-size:29px;font-weight:700;letter-spacing:-.03em;line-height:1.1;margin:2px 0 6px}
+.m svg{width:100%;height:34px;display:block}
+.ch{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:10px;flex-wrap:wrap}
+.leg{display:flex;gap:14px;color:var(--mu);font-size:12px;flex-wrap:wrap}
+.leg i,.tip i{display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:6px}
+.chart{width:100%;height:210px;display:block;cursor:crosshair}
+.row{display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid var(--line)}
+.row:last-child{border-bottom:0}
+.row .grow{flex:1;min-width:0}
+.bar{height:6px;border-radius:9px;background:var(--panel2);overflow:hidden;margin-top:6px}
+.bar>i{display:block;height:100%;border-radius:9px;background:linear-gradient(90deg,var(--ac),var(--ac2));transition:width .5s}
+.tag{border-radius:8px;padding:1px 9px;font-size:12px;background:var(--panel2);color:var(--mu)}
+.tag.bad{background:color-mix(in srgb,var(--bad) 16%,transparent);color:var(--bad)}
+.ip{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px}
+.tools{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+input[type=text]{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:8px 12px;min-width:200px;flex:1}
+.empty{text-align:center;color:var(--mu);padding:30px 10px}
+.log{font:12.5px/1.7 ui-monospace,SFMono-Regular,Menlo,monospace}
+.log div{padding:2px 0;border-bottom:1px dashed var(--line)}
+.log .WARNING{color:var(--warn)}.log .INFO{color:var(--mu)}.log .ERROR{color:var(--bad)}
+.set{padding:14px 0;border-bottom:1px solid var(--line)}
+.set:last-child{border-bottom:0}
+.set .top{display:flex;justify-content:space-between;margin-bottom:8px}
+input[type=range]{width:100%;accent-color:var(--ac)}
+.seg{display:flex;gap:6px}.sw{display:flex;gap:10px}
+.sw button{width:30px;height:30px;border-radius:50%;border:2px solid transparent;cursor:pointer;box-shadow:inset 0 0 0 2px var(--panel)}
+.sw button[aria-pressed="true"]{border-color:var(--tx)}
+.score{margin-bottom:6px}.score b{font-size:30px;letter-spacing:-.03em}
+.dot{width:10px;height:10px;border-radius:50%;flex:none}
+.dot.ok{background:var(--ok);box-shadow:0 0 0 4px color-mix(in srgb,var(--ok) 20%,transparent)}
+.dot.ko{background:var(--warn);box-shadow:0 0 0 4px color-mix(in srgb,var(--warn) 20%,transparent)}
+.tip{position:fixed;z-index:20;pointer-events:none;background:var(--panel);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid var(--line);border-radius:12px;padding:8px 12px;font-size:12.5px;box-shadow:var(--sh)}
+#toasts{position:fixed;right:18px;bottom:calc(18px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:8px;z-index:9}
+.toast{background:var(--tx);color:var(--bg);padding:10px 16px;border-radius:14px;box-shadow:var(--sh);animation:in .25s}
+@keyframes in{from{transform:translateY(8px);opacity:0}}
+@media (max-width:860px){
+ .app{grid-template-columns:minmax(0,1fr);padding:8px}
+ .side{position:static;height:auto;flex-direction:row;overflow-x:auto;padding:8px;border-radius:20px}
+ .logo,.foot,.sp{display:none}.nav{width:auto;white-space:nowrap}
+ main{padding:14px 6px 30px}.hero{grid-template-columns:minmax(0,1fr)}.threat{flex-direction:column;text-align:center}
+}
+
+.f{width:100%;box-sizing:border-box;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:8px 12px;font:inherit;color:var(--tx)}
+.f:focus{outline:2px solid var(--ac);outline-offset:1px}
+textarea.f{resize:vertical;min-height:96px;font-family:ui-monospace,Consolas,monospace;font-size:13px}
+.g2{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.btn.bad{border-color:var(--bad);color:var(--bad)}
+.adm{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));align-items:start}
+.lock{max-width:420px;margin:28px auto;text-align:center;display:grid;gap:12px;justify-items:center}
+.lock svg{width:46px;height:46px;fill:none;stroke:var(--ac);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.lock .f{text-align:center}
+.hint{font-size:12.5px;margin-top:6px}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="side">
+ <div class="logo"><i><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/></svg></i>AntiDDoS</div>
+ <div id="nav" style="display:contents"></div>
+ <div class="sp"></div>
+ <div class="foot" id="foot"></div>
+</aside>
+<main>
+ <div id="banner" class="banner" hidden></div>
+ <header class="head">
+  <div><h1 id="title"></h1><div class="mu" id="sub"></div></div>
+  <div class="actions"><span id="pill" class="pill"></span><button id="pause" class="btn" aria-label="Mettre en pause"></button><button id="sim" class="btn" hidden></button><button id="theme" class="btn" aria-label="Changer de thème"></button></div>
+ </header>
+
+ <section class="view" id="v-overview">
+  <div class="grid hero">
+   <div class="card threat" id="threat">
+    <svg viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="52" fill="none" style="stroke:var(--panel2)" stroke-width="11"/><circle id="ring" cx="60" cy="60" r="52" fill="none" style="stroke:var(--lvl,var(--ok));transition:stroke-dasharray .6s,stroke .3s" stroke-width="11" stroke-linecap="round" stroke-dasharray="0 327" transform="rotate(-90 60 60)"/><text id="pct" x="60" y="67" text-anchor="middle" style="fill:var(--tx);font-size:26px;font-weight:700">0</text></svg>
+    <div><div class="mu">Niveau de menace</div><div class="big" id="lvl"></div><div class="mu" id="lvlsub" style="margin-top:4px"></div></div>
+   </div>
+   <div class="metrics" id="metrics"></div>
+  </div>
+  <div class="grid two">
+   <div class="card"><div class="ch"><h2>Trafic en direct</h2><div class="leg"><span><i style="background:var(--ac)"></i>Connexions</span><span><i style="background:var(--warn)"></i>SYN</span><span><i style="background:var(--ok)"></i>Requêtes HTTP</span></div></div><svg id="c1" class="chart" viewBox="0 0 600 200" preserveAspectRatio="none" role="img" aria-label="Trafic en direct"></svg></div>
+   <div class="card"><div class="ch"><h2>Bande passante</h2><div class="leg"><span><i style="background:var(--ac2)"></i>Entrant <b id="rx"></b></span><span><i style="background:var(--ac)"></i>Sortant <b id="tx"></b></span></div></div><svg id="c2" class="chart" viewBox="0 0 600 200" preserveAspectRatio="none" role="img" aria-label="Bande passante"></svg></div>
+  </div>
+  <div class="grid two">
+   <div class="card"><div class="ch"><h2>IP les plus actives</h2></div><div id="toplist"></div></div>
+   <div class="card"><div class="ch"><h2>Derniers événements</h2><button class="btn sm" data-go="events">Tout voir</button></div><div class="log" id="recent"></div></div>
+  </div>
+  <div class="grid two">
+   <div class="card"><div class="ch"><h2>Santé de la protection</h2></div><div id="health"></div></div>
+   <div class="card"><div class="ch"><h2>Records de la session</h2></div><div id="peaks"></div></div>
+  </div>
+ </section>
+
+ <section class="view" id="v-bans">
+  <div class="card">
+   <div class="tools"><input type="text" id="q" placeholder="Rechercher une IP" aria-label="Rechercher une IP"><input type="text" id="newip" placeholder="IP à bannir, par exemple 8.8.4.4" aria-label="IP à bannir"><button class="btn pri" id="banbtn">Bannir cette IP</button></div>
+   <div id="banlist"></div>
+  </div>
+ </section>
+
+ <section class="view" id="v-shield">
+  <div class="grid hero"><div class="card" id="shieldcard"></div><div class="card"><h2>Comment ça marche</h2><p class="mu">Chaque IP bannie est ajoutée à une règle du pare-feu Windows (<code>AntiDDoS-Block</code>) et retirée toute seule à la fin du ban. Quand tu fermes l’application, la règle est supprimée et tout le monde est débanni.</p></div></div>
+  <div class="card"><div class="ch"><h2>Bans par type de détection</h2></div><div id="shieldlist"></div></div>
+ </section>
+
+ <section class="view" id="v-events">
+  <div class="card"><div class="tools"><button class="btn sm pri" data-f="all">Tous</button><button class="btn sm" data-f="WARNING">Alertes</button><button class="btn sm" data-f="INFO">Infos</button></div><div class="log" id="evlist"></div></div>
+ </section>
+
+ <section class="view" id="v-settings">
+  <div class="card" id="setlist"><h2>Seuils de détection</h2><p class="mu" style="margin:4px 0 8px">Les changements s’appliquent tout de suite. Ils sont enregistrés automatiquement.</p></div>
+ </section>
+ <section class="view" id="v-admin"><div id="adminbox"></div></section>
+</main>
+</div>
+<div id="tip" class="tip" hidden></div>
+<div id="toasts" aria-live="polite"></div>
+
+<script>
+const q=s=>document.querySelector(s),qa=s=>[...document.querySelectorAll(s)];
+const TOKEN=new URLSearchParams(location.search).get("token")||"";
+const H={"X-Token":TOKEN,"Content-Type":"application/json"};
+const h=(t,a={},...c)=>{const e=document.createElement(t);for(const k in a){k==="class"?e.className=a[k]:k.startsWith("on")?e[k]=a[k]:e.setAttribute(k,a[k])}c.flat().forEach(x=>e.append(x instanceof Node?x:document.createTextNode(x??"")));return e};
+const IC={overview:'<rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/>',bans:'<circle cx="12" cy="12" r="9"/><path d="M5.6 5.6l12.8 12.8"/>',shield:'<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/>',events:'<path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>',settings:'<path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/>',lock:'<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/>',moon:'<path d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z"/>',bolt:'<path d="M13 2L4 14h7l-1 8 9-12h-7z"/>',pause:'<path d="M8 5v14M16 5v14"/>',play:'<path d="M7 4l13 8-13 8z"/>'};
+const svg=n=>`<svg viewBox="0 0 24 24" aria-hidden="true">${IC[n]}</svg>`;
+const VIEWS=[["overview","Vue d’ensemble","Surveillance en direct de ton serveur"],["bans","IP bannies","Qui est bloqué, et pour combien de temps"],["shield","Pare-feu","Blocage par le pare-feu Windows"],["events","Journal","Tout ce que la protection a fait"],["settings","Réglages","Ajuste la sensibilité de la détection"]];
+const fN=n=>n>=1e6?(n/1e6).toFixed(1)+" M":n>=1e3?(n/1e3).toFixed(1)+" k":String(Math.round(n));
+const fT=s=>{s=Math.max(0,Math.round(s));const m=Math.floor(s/60);return m>=60?Math.floor(m/60)+" h "+String(m%60).padStart(2,"0"):m+" min "+String(s%60).padStart(2,"0")+" s"};
+let S=null,demo=false,view="overview",evFilter="all",paused=false,prevAtk=null;
+
+function toast(m){const t=h("div",{class:"toast"},m);q("#toasts").append(t);setTimeout(()=>t.remove(),2800)}
+function smooth(p){let d=`M${p[0][0]},${p[0][1]}`;for(let i=1;i<p.length;i++){const[x0,y0]=p[i-1],[x1,y1]=p[i],m=(x0+x1)/2;d+=` C${m},${y0} ${m},${y1} ${x1},${y1}`}return d}
+function chart(el,series){
+ const W=600,Hh=200,n=series[0].d.length;if(n<2){el.innerHTML="";return}const mx=Math.max(10,...series.flatMap(s=>s.d))*1.18;el._s=series;
+ let o="<defs>"+series.map((s,i)=>`<linearGradient id="${el.id}g${i}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:${s.c};stop-opacity:.28"/><stop offset="1" style="stop-color:${s.c};stop-opacity:0"/></linearGradient>`).join("")+"</defs>";
+ for(let i=1;i<4;i++)o+=`<line x1="0" x2="${W}" y1="${i*Hh/4}" y2="${i*Hh/4}" style="stroke:var(--line)" stroke-dasharray="3 5" vector-effect="non-scaling-stroke"/>`;
+ series.forEach((s,i)=>{const p=s.d.map((v,k)=>[k/(n-1)*W,Hh-4-(v/mx)*(Hh-12)]),d=smooth(p);
+  o+=`<path d="${d} L${W},${Hh} L0,${Hh} Z" fill="url(#${el.id}g${i})"/><path d="${d}" fill="none" style="stroke:${s.c}" stroke-width="2.2" vector-effect="non-scaling-stroke"/>`});
+ el.innerHTML=o}
+const ago=s=>s?"il y a "+s+" s":"maintenant";
+function hover(el,names,fmt){if(el._h)return;el._h=1;const tip=q("#tip");
+ el.addEventListener("pointermove",e=>{const sr=el._s;if(!sr)return;const r=el.getBoundingClientRect(),n=sr[0].d.length,i=Math.max(0,Math.min(n-1,Math.round((e.clientX-r.left)/r.width*(n-1))));
+  tip.replaceChildren(h("div",{class:"mu"},ago((n-1-i)*2)),...sr.map((x,k)=>h("div",{},h("i",{style:"background:"+x.c}),names[k]+" : "+fmt(x.d[i]))));
+  tip.hidden=false;tip.style.left=Math.min(innerWidth-190,e.clientX+14)+"px";tip.style.top=(e.clientY+14)+"px"});
+ el.addEventListener("pointerleave",()=>tip.hidden=true)}
+function spark(d,c){const n=d.length,mx=Math.max(1,...d);return `<svg viewBox="0 0 100 34" preserveAspectRatio="none"><polyline fill="none" style="stroke:${c}" stroke-width="2" vector-effect="non-scaling-stroke" points="${d.map((v,i)=>(i/(n-1)*100).toFixed(1)+","+(31-(v/mx)*27).toFixed(1)).join(" ")}"/></svg>`}
+
+function threat(){
+ const l=S.history[S.history.length-1]||[0,0,0,0,0,0],t=S.triggers;
+ const r=Math.max(l[1]/t.conn,l[2]/t.syn,l[3]/t.http);
+ const pct=S.attack?Math.max(85,Math.min(100,Math.round(r*100))):Math.min(79,Math.round(r*100));
+ const lv=S.attack||pct>=80?["Sous attaque","var(--bad)","Les limites par IP sont durcies automatiquement."]:pct>=35?["Activité élevée","var(--warn)","Le trafic monte, la protection reste attentive."]:["Tout est calme","var(--ok)","Aucune menace détectée en ce moment."];
+ q("#threat").style.setProperty("--lvl",lv[1]);q("#lvl").textContent=lv[0];q("#lvlsub").textContent=lv[2];
+ q("#ring").setAttribute("stroke-dasharray",`${pct*3.267} 327`);q("#pct").textContent=pct;
+ const pill=q("#pill");pill.textContent=S.attack?"Mode attaque":S.dry_run?"Simulation":"Protection active";
+ pill.className="pill"+(S.attack?" bad":S.dry_run?" warn":"");
+}
+function render(){
+ const hs=S.history,col=i=>hs.map(x=>x[i]);
+ threat();
+ q("#sub").textContent=VIEWS.find(v=>v[0]===view)[2]+" · actif depuis "+fT(S.uptime);
+ const l=hs[hs.length-1]||[0,0,0,0,0,0];
+ q("#metrics").replaceChildren(...[["Connexions",l[1],1,"var(--ac)"],["Demi-connexions SYN",l[2],2,"var(--warn)"],["Requêtes HTTP",l[3],3,"var(--ok)"],["IP bannies",S.banned.length,null,"var(--bad)"]].map(m=>{const e=h("div",{class:"card m"},h("div",{class:"mu"},m[0]),h("div",{class:"v"},fN(m[1])));if(m[2]!==null)e.insertAdjacentHTML("beforeend",spark(col(m[2]),m[3]));else e.append(h("div",{class:"mu"},S.total_bans+" bans depuis le démarrage"));return e}));
+ chart(q("#c1"),[{d:col(1),c:"var(--ac)"},{d:col(2),c:"var(--warn)"},{d:col(3),c:"var(--ok)"}]);
+ chart(q("#c2"),[{d:col(4),c:"var(--ac2)"},{d:col(5),c:"var(--ac)"}]);
+ hover(q("#c1"),["Connexions","SYN","HTTP"],v=>Math.round(v));hover(q("#c2"),["Entrant","Sortant"],v=>v.toFixed(1)+" Mb/s");
+ q("#rx").textContent=l[4].toFixed(1)+" Mb/s";q("#tx").textContent=l[5].toFixed(1)+" Mb/s";
+ const tl=S.top_http.length?S.top_http:S.top_conn,mx=Math.max(1,...tl.map(x=>x[1]));
+ q("#toplist").replaceChildren(...(tl.length?tl.map(x=>h("div",{class:"row"},h("div",{class:"grow"},h("div",{class:"ip"},x[0]),h("div",{class:"bar"},h("i",{style:`width:${x[1]/mx*100}%`}))),h("b",{},fN(x[1])))):[h("div",{class:"empty"},"Aucune activité à signaler.")]));
+ q("#recent").replaceChildren(...S.events.slice(0,6).map(e=>h("div",{class:e.level},e.t+"  "+e.msg)));
+ q("#foot").textContent=(S.dry_run?"Mode simulation, rien n’est bloqué":"Protection en cours")+" · Raccourcis : 1 à 5, T, P, /";
+ renderBans();renderShield();renderEvents();renderSettings();extra();
+ qa(".nav").forEach(b=>{const c=b.querySelector("b");if(b.dataset.v==="bans"){if(c)c.remove();if(S.banned.length)b.append(h("b",{},S.banned.length))}});
+}
+function extra(){
+ const hs=S.history,mx=i=>Math.max(0,...hs.map(x=>x[i]));
+ const it=[["Détection active",true,"Le démon surveille tes connexions"],["Blocage réel",!S.dry_run,S.dry_run?"Mode simulation : rien n’est bloqué":"Les IP abusives sont bloquées"],["Pare-feu Windows",S.shield.active,S.shield.active?"Prêt à bloquer les IP abusives":"Inactif : mode simulation ou droits administrateur manquants"],["Mode attaque",!S.attack,S.attack?"Actif : seuils durcis":"En veille, trafic normal"]];
+ q("#health").replaceChildren(h("div",{class:"score"},h("b",{},it.filter(x=>x[1]).length+"/4"),h("span",{class:"mu"}," protections au vert")),...it.map(x=>h("div",{class:"row"},h("span",{class:"dot "+(x[1]?"ok":"ko")}),h("div",{class:"grow"},h("div",{},x[0]),h("div",{class:"mu"},x[2])))));
+ q("#peaks").replaceChildren(...[["Pic de connexions",fN(mx(1))],["Pic de requêtes HTTP",fN(mx(3))],["Pic entrant",mx(4).toFixed(1)+" Mb/s"],["Pic sortant",mx(5).toFixed(1)+" Mb/s"],["Bans depuis le démarrage",S.total_bans]].map(x=>h("div",{class:"row"},h("div",{class:"grow mu"},x[0]),h("b",{},x[1]))))}
+function renderBans(){
+ const f=q("#q").value.trim(),L=S.banned.filter(b=>b.ip.includes(f));
+ q("#banlist").replaceChildren(...(L.length?L.map(b=>{const tot=Math.min(S.config.ban_seconds*2**(b.offenses-1),86400);
+  return h("div",{class:"row"},h("div",{class:"grow"},h("div",{class:"ip"},b.ip),h("div",{class:"bar"},h("i",{style:`width:${Math.min(100,b.remaining/tot*100)}%`}))),h("span",{class:"mu"},fT(b.remaining)),h("span",{class:"tag"+(b.offenses>1?" bad":"")},b.offenses>1?b.offenses+" récidives":"1er ban"),h("button",{class:"btn sm",onclick:()=>act("unban",{ip:b.ip},"IP débannie")},"Débannir"))
+ }):[h("div",{class:"empty"},f?"Aucune IP ne correspond.":"Aucune IP bannie pour l’instant. Bonne nouvelle.")]))}
+function renderShield(){
+ const sh=S.shield,c=Object.entries(sh.counters||{}),tot=c.reduce((a,x)=>a+x[1][0],0),mx=Math.max(1,...c.map(x=>x[1][0]));
+ q("#shieldcard").replaceChildren(h("div",{class:"mu"},"État du pare-feu"),h("div",{class:"big",style:`font-size:25px;font-weight:700;color:var(${sh.active?"--ok":"--warn"})`},sh.active?"Actif":"Inactif"),h("div",{class:"mu",style:"margin-top:4px"},sh.active?fN(tot)+" bans depuis le démarrage":"Relance l’application en administrateur pour bloquer pour de vrai."));
+ q("#shieldlist").replaceChildren(...(c.length?c.sort((a,b)=>b[1][0]-a[1][0]).map(x=>h("div",{class:"row"},h("div",{class:"grow"},h("div",{},x[0]),h("div",{class:"bar"},h("i",{style:`width:${x[1][0]/mx*100}%`}))),h("b",{},fN(x[1][0])))):[h("div",{class:"empty"},"Aucun ban pour l’instant.")]))}
+function renderEvents(){q("#evlist").replaceChildren(...S.events.filter(e=>evFilter==="all"||e.level===evFilter).map(e=>h("div",{class:e.level},e.t+"  "+e.msg)))}
+const SET=[["max_established_per_ip","Connexions simultanées par IP",5,500,""],["max_syn_recv_per_ip","Demi-connexions (SYN) par IP",3,200,""],["max_requests_per_window","Requêtes HTTP par IP, par fenêtre",10,2000,""],["ban_seconds","Durée du premier ban",30,3600," s"]];
+let tm={};
+function renderSettings(){const box=q("#setlist");if(!box.dataset.built){box.dataset.built=1;SET.forEach(s=>{const lab=h("b",{id:"v_"+s[0]}),r=h("input",{type:"range",min:s[2],max:s[3],id:"r_"+s[0],"aria-label":s[1]});
+  r.oninput=()=>{lab.textContent=r.value+s[4];clearTimeout(tm[s[0]]);tm[s[0]]=setTimeout(()=>act("config",{key:s[0],value:+r.value},"Réglage enregistré"),400)};
+  box.append(h("div",{class:"set"},h("div",{class:"top"},h("span",{},s[1]),lab),r))})}
+ SET.forEach(s=>{const r=q("#r_"+s[0]);if(document.activeElement!==r){r.value=S.config[s[0]];q("#v_"+s[0]).textContent=S.config[s[0]]+s[4]}})}
+
+async function act(kind,body,msg){
+ try{if(demo)D.act(kind,body);else{const r=await fetch("/api/"+kind,{method:"POST",headers:H,body:JSON.stringify(body)});if(!r.ok)throw new Error((await r.json()).error)}
+  toast(msg);pull()}catch(e){toast(String(e.message||e).replace("requête invalide : ",""))}}
+
+const D={
+ init(){this.atk=false;this.t0=Date.now();this.cur=[140,4,90,6,2];this.hist=[];this.bans=[{ip:"203.0.113.45",remaining:510,offenses:1},{ip:"198.51.100.23",remaining:1180,offenses:3}];this.ev=[{t:"14:02:11",level:"INFO",msg:"AntiDDoS démarré | ports=[80, 443] | dry_run=False"}];
+  this.cfg={max_established_per_ip:100,max_syn_recv_per_ip:30,max_requests_per_window:200,ban_seconds:600};this.total=2;
+  this.sh={"Flood SYN":[420,0],"Trop de connexions":[130,0],"Amplification UDP":[2210,0],"Flags TCP anormaux":[88,0],"Brute force SSH":[37,0],"Paquets invalides":[301,0]};for(let i=0;i<60;i++)this.step()},
+ step(){const a=this.atk,tg=a?[1900,260,3600,310,45]:[140,4,90,6,2];this.cur=this.cur.map((v,k)=>Math.max(0,v+(tg[k]-v)*(a?.3:.2)+(Math.random()-.5)*tg[k]*.09));this.hist.push([Date.now(),...this.cur.map((v,k)=>k<3?Math.round(v):+v.toFixed(1))]);if(this.hist.length>60)this.hist.shift()},
+ clk(){return new Date().toTimeString().slice(0,8)},
+ tick(){this.step();this.bans.forEach(b=>b.remaining-=2);this.bans=this.bans.filter(b=>b.remaining>0);
+  if(this.atk){for(const k in this.sh)this.sh[k][0]+=Math.round(Math.random()*400*(k==="Amplification UDP"?4:1));
+   if(Math.random()<.8){const ip="203.0.113."+(100+Math.floor(Math.random()*150));if(!this.bans.find(b=>b.ip===ip)){this.bans.unshift({ip,remaining:1200,offenses:1});this.total++;this.ev.unshift({t:this.clk(),level:"WARNING",msg:"BAN "+ip+" pour 1200s (infraction n°1) : "+Math.round(60+Math.random()*300)+" requêtes HTTP en 10s (limite 100)"})}}}},
+ toggle(){this.atk=!this.atk;this.ev.unshift(this.atk?{t:this.clk(),level:"WARNING",msg:"MODE ATTAQUE activé : limites par IP divisées par 2"}:{t:this.clk(),level:"INFO",msg:"Retour au calme : mode attaque désactivé"})},
+ act(k,b){if(k==="ban"){if(!/^\d+\.\d+\.\d+\.\d+$/.test(b.ip))throw new Error("Adresse IP invalide");if(/^(10\.|192\.168\.|127\.)/.test(b.ip))throw new Error("IP protégée (privée ou liste blanche)");this.bans.unshift({ip:b.ip,remaining:this.cfg.ban_seconds,offenses:1});this.total++;this.ev.unshift({t:this.clk(),level:"WARNING",msg:"BAN "+b.ip+" : ban manuel depuis le dashboard"})}
+  else if(k==="unban"){this.bans=this.bans.filter(x=>x.ip!==b.ip);this.ev.unshift({t:this.clk(),level:"INFO",msg:"DÉBAN manuel : "+b.ip})}else if(k==="config")this.cfg[b.key]=b.value},
+ state(){const top=[["198.51.100.77",112],["203.0.113.12",88],["192.0.2.140",46],["198.51.100.9",31]].map(x=>[x[0],Math.round(x[1]*(this.atk?7:1)*(.9+Math.random()*.2))]);
+  return{uptime:(Date.now()-this.t0)/1000+11520,dry_run:false,attack:this.atk,banned:this.bans,total_bans:this.total,history:this.hist,top_conn:[],top_http:top,events:this.ev.slice(0,80),config:this.cfg,triggers:{conn:1500,syn:200,http:3000},shield:{active:true,counters:this.sh}}}
+};
+
+async function pull(){
+ if(paused)return;
+ if(!demo){try{const r=await fetch("/api/state",{headers:H});
+  if(r.status===401){q("#banner").hidden=false;q("#banner").textContent="Jeton invalide. Ouvre l’URL complète affichée au démarrage, avec ?token=…";return}
+  if(!r.ok||!(r.headers.get("content-type")||"").includes("json"))throw 0;S=await r.json()}catch(e){demo=true;D.init();setupDemo()}}
+ if(demo){D.tick();S=D.state()}
+ if(prevAtk!==null&&S.attack!==prevAtk)toast(S.attack?"Mode attaque activé":"Retour au calme");prevAtk=S.attack;
+ render()}
+function setupDemo(){const b=q("#banner");b.hidden=false;b.textContent="Mode démo : données fictives. Dans l’appli installée sur ton serveur, ce sont tes vraies données.";
+ const s=q("#sim");s.hidden=false;s.innerHTML=svg("bolt");const t=h("span",{},"");s.append(t);const up=()=>t.textContent=D.atk?"Arrêter l’attaque":"Simuler une attaque";up();s.onclick=()=>{D.toggle();up();pull()}}
+
+function go(v){view=v;if(v==="admin"&&!AD.built){AD.built=true;buildAdmin()}qa(".view").forEach(e=>e.classList.toggle("on",e.id==="v-"+v));qa(".nav").forEach(b=>b.classList.toggle("on",b.dataset.v===v));q("#title").textContent=VIEWS.find(x=>x[0]===v)[1];if(S)render()}
+VIEWS.forEach(v=>{const b=h("button",{class:"nav","data-v":v[0],onclick:()=>go(v[0])},h("span",{style:"display:contents"},""),v[1]);b.firstChild.innerHTML=svg(v[0]);q("#nav").append(b)});
+qa("[data-go]").forEach(b=>b.onclick=()=>go(b.dataset.go));
+qa("[data-f]").forEach(b=>b.onclick=()=>{evFilter=b.dataset.f;qa("[data-f]").forEach(x=>x.classList.toggle("pri",x===b));renderEvents()});
+q("#q").oninput=()=>S&&renderBans();
+q("#banbtn").onclick=()=>{const ip=q("#newip").value.trim();if(!ip)return toast("Entre une adresse IP");act("ban",{ip},"IP bannie");q("#newip").value=""};
+q("#theme").innerHTML=svg("moon");
+function setTheme(m){const r=document.documentElement;m==="auto"?r.removeAttribute("data-theme"):r.dataset.theme=m;try{localStorage.setItem("ad-theme",m)}catch(e){}qa("[data-th]").forEach(b=>b.classList.toggle("pri",b.dataset.th===m))}
+const ACC={indigo:"#6366f1",cyan:"#0ea5c6",emerald:"#10b981",rose:"#f43f5e"};
+function setAccent(a){document.documentElement.dataset.accent=a;try{localStorage.setItem("ad-accent",a)}catch(e){}qa("[data-ac]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.ac===a))}
+q("#theme").onclick=()=>{const r=document.documentElement,dark=r.dataset.theme?r.dataset.theme==="dark":matchMedia("(prefers-color-scheme:dark)").matches;setTheme(dark?"light":"dark")};
+q("#v-settings").append(h("div",{class:"card",style:"margin-top:16px"},h("h2",{},"Apparence"),
+ h("div",{class:"set"},h("div",{class:"top"},h("span",{},"Thème")),h("div",{class:"seg"},...[["auto","Auto"],["light","Clair"],["dark","Sombre"]].map(t=>h("button",{class:"btn sm","data-th":t[0],onclick:()=>setTheme(t[0])},t[1])))),
+ h("div",{class:"set"},h("div",{class:"top"},h("span",{},"Couleur d’accent")),h("div",{class:"sw"},...Object.entries(ACC).map(([k,v])=>h("button",{"data-ac":k,"aria-label":k,style:"background:"+v,onclick:()=>setAccent(k)}))))));
+{let t="auto",a="indigo";try{t=localStorage.getItem("ad-theme")||t;a=localStorage.getItem("ad-accent")||a}catch(e){}setTheme(t);setAccent(a)}
+q("#pause").innerHTML=svg("pause");
+q("#pause").onclick=()=>{paused=!paused;q("#pause").innerHTML=svg(paused?"play":"pause");q("#pause").setAttribute("aria-label",paused?"Reprendre l’affichage":"Mettre en pause");toast(paused?"Affichage en pause":"Affichage repris");if(!paused)pull()};
+addEventListener("keydown",e=>{if(e.target.matches("input")||e.ctrlKey||e.metaKey||e.altKey)return;const k=e.key.toLowerCase(),i="123456".indexOf(k);if(i>=0){if(VIEWS[i])go(VIEWS[i][0])}else if(k==="t")q("#theme").click();else if(k==="p")q("#pause").click();else if(k==="/"){e.preventDefault();go("bans");q("#q").focus()}});
+
+/* ---------- Espace administrateur ---------- */
+const AD={on:false,configured:true,unlocked:false,sess:"",
+ demo:{cfg:{ports:[80,443,30120],access_log:"",whitelist:["127.0.0.1","::1","203.0.113.7"],attack_total_connections:1500,attack_total_syn:200,attack_total_requests:3000,attack_calm_seconds:60,max_ban_seconds:86400,dry_run:false}}};
+async function adm(path,body){
+ if(demo){await new Promise(r=>setTimeout(r,150));
+  if(path==="login"){if(!body.password)throw new Error("mot de passe incorrect");return{session:"demo"}}
+  if(path==="setup"){if((body.password||"").length<6)throw new Error("6 caractères minimum");return{session:"demo"}}
+  if(path==="config_get")return JSON.parse(JSON.stringify(AD.demo.cfg));
+  if(path==="config_set"){Object.assign(AD.demo.cfg,body);return{ok:true}}
+  if(path==="unban_all"){D.bans=[];return{ok:true}}
+  return{ok:true}}
+ const r=await fetch("/api/admin/"+path,{method:"POST",headers:{...H,"X-Admin":AD.sess},body:JSON.stringify(body||{})});
+ const j=await r.json().catch(()=>({}));
+ if(!r.ok){const e=new Error((j.error||"erreur").replace("requête invalide : ",""));e.code=r.status;throw e}
+ return j}
+async function adminInit(){
+ if(demo){AD.on=true;AD.configured=true}
+ else{try{const r=await fetch("/api/admin/status",{headers:H});if(r.ok){const s=await r.json();AD.on=!!s.enabled;AD.configured=!!s.configured}}catch(e){}}
+ if(!AD.on)return;
+ VIEWS.push(["admin","Admin","Réglages avancés, réservés à l’administrateur"]);
+ const b=h("button",{class:"nav","data-v":"admin",onclick:()=>go("admin")},h("span",{style:"display:contents"},""),"Admin");
+ b.firstChild.innerHTML=svg("lock");q("#nav").append(b);
+ if(location.hash==="#admin")go("admin")}
+function fld(label,hint,input){return h("div",{class:"set"},h("div",{class:"top"},h("span",{},label)),input,hint?h("div",{class:"mu hint"},hint):"")}
+function inp(v,ph,type="text"){const e=h("input",{class:"f",type,placeholder:ph||""});e.value=v??"";return e}
+async function admDo(path,body,msg){
+ try{await adm(path,body);toast(msg);return true}
+ catch(e){toast(e.message);if(e.code===401){AD.unlocked=false;buildAdmin()}return false}}
+function buildAdmin(){
+ const box=q("#adminbox");
+ if(!AD.unlocked)return box.replaceChildren(lockCard());
+ box.replaceChildren(h("div",{class:"mu"},"Chargement…"));
+ adm("config_get").then(c=>box.replaceChildren(adminCards(c))).catch(e=>{AD.unlocked=false;toast(e.message);buildAdmin()})}
+function lockCard(){
+ const first=!AD.configured,
+  pw=inp("",first?"Choisis un mot de passe (6 caractères minimum)":"Mot de passe administrateur","password"),
+  pw2=first?inp("","Répète le mot de passe","password"):null;
+ pw.setAttribute("aria-label","Mot de passe");
+ const submit=async()=>{try{
+  if(first&&pw.value!==pw2.value)throw new Error("Les deux mots de passe sont différents");
+  const j=await adm(first?"setup":"login",{password:pw.value});
+  AD.sess=j.session;AD.unlocked=true;AD.configured=true;toast(first?"Mot de passe créé":"Espace admin déverrouillé");buildAdmin()
+ }catch(e){toast(e.message);pw.value="";if(pw2)pw2.value=""}};
+ (pw2||pw).onkeydown=e=>{if(e.key==="Enter")submit()};
+ const c=h("div",{class:"card lock"});c.innerHTML=svg("lock");
+ c.append(h("h2",{},first?"Crée ton accès administrateur":"Espace administrateur"),
+  h("div",{class:"mu"},first?"Ce mot de passe protège les réglages avancés de cette installation.":"Entre ton mot de passe pour modifier les réglages avancés."),
+  pw,...(pw2?[pw2]:[]),h("button",{class:"btn pri",onclick:submit},first?"Créer et entrer":"Déverrouiller"),
+  demo?h("div",{class:"mu hint"},"Démo : tape n’importe quel mot de passe."):"");
+ return c}
+function adminCards(c){
+ const ports=inp(c.ports.join(", "),"80, 443, 30120"),logp=inp(c.access_log,"C:\\nginx\\logs\\access.log (facultatif)"),
+  wl=h("textarea",{class:"f",rows:"5","aria-label":"Liste blanche"});wl.value=c.whitelist.join("\n");
+ const num=[["attack_total_connections","Connexions totales pour le mode attaque"],["attack_total_syn","SYN totaux pour le mode attaque"],["attack_total_requests","Requêtes HTTP totales pour le mode attaque"],["attack_calm_seconds","Calme avant de quitter le mode attaque (s)"],["max_ban_seconds","Durée maximale d’un ban (s)"]].map(([k,l])=>({k,l,i:inp(c[k],"","number")}));
+ let sim=c.dry_run;const seg=h("div",{class:"seg"});
+ const setSim=v=>{sim=v;[...seg.children].forEach((b,i)=>b.classList.toggle("pri",(i===0)===v))};
+ seg.append(h("button",{class:"btn sm",onclick:async()=>{if(await admDo("config_set",{dry_run:true},"Mode simulation activé"))setSim(true)}},"Simulation"),
+  h("button",{class:"btn sm",onclick:async()=>{if(await admDo("config_set",{dry_run:false},"Blocage réel activé"))setSim(false)}},"Blocage réel"));setSim(sim);
+ const o=h("input",{class:"f",type:"password",placeholder:"Ancien mot de passe","aria-label":"Ancien mot de passe"}),n=h("input",{class:"f",type:"password",placeholder:"Nouveau mot de passe","aria-label":"Nouveau mot de passe"});
+ const card=(t,sub,...ch)=>h("div",{class:"card"},h("h2",{},t),sub?h("p",{class:"mu",style:"margin:4px 0 6px"},sub):"",...ch);
+ return h("div",{class:"adm"},
+  card("Surveillance","Ce que l’application surveille sur cette machine.",
+   fld("Ports surveillés","Séparés par des virgules. Seul le trafic TCP est compté.",ports),
+   fld("Fichier de log d’accès","Facultatif : nginx ou Apache, avec l’IP en début de ligne.",logp),
+   h("button",{class:"btn pri",onclick:()=>{const L=ports.value.split(/[\s,;]+/).filter(Boolean).map(Number);
+    if(!L.length||L.some(x=>!Number.isInteger(x)||x<1||x>65535))return toast("Ports invalides : nombres entre 1 et 65535");
+    admDo("config_set",{ports:L,access_log:logp.value.trim()},"Surveillance enregistrée")}},"Enregistrer")),
+  card("Liste blanche","Ces adresses ne sont jamais bannies.",
+   fld("Une IP ou une plage par ligne","Ajoute ton IP publique pour ne jamais te bloquer toi-même.",wl),
+   h("button",{class:"btn pri",onclick:()=>admDo("config_set",{whitelist:wl.value.split(/\s+/).filter(Boolean)},"Liste blanche enregistrée")},"Enregistrer")),
+  card("Seuils avancés","Quand l’application passe en mode attaque.",
+   h("div",{class:"g2"},...num.map(x=>fld(x.l,"",x.i))),
+   h("button",{class:"btn pri",style:"margin-top:8px",onclick:()=>{const b={};num.forEach(x=>b[x.k]=+x.i.value);admDo("config_set",b,"Seuils enregistrés")}},"Enregistrer")),
+  card("Protection","",
+   fld("Mode","Simulation : détecte et journalise, sans rien bloquer.",seg),
+   h("div",{class:"set"},h("button",{class:"btn bad",onclick:()=>{if(confirm("Débannir toutes les IP maintenant ?"))admDo("unban_all",{},"Toutes les IP sont débannies").then(()=>pull())}},"Débannir toutes les IP"))),
+  card("Sécurité","",
+   fld("Changer le mot de passe","6 caractères minimum.",h("div",{class:"g2"},o,n)),
+   h("div",{class:"tools"},h("button",{class:"btn pri",onclick:async()=>{if(await admDo("password",{old:o.value,new:n.value},"Mot de passe modifié")){o.value="";n.value=""}}},"Changer"),
+    h("button",{class:"btn",onclick:async()=>{await admDo("logout",{},"Espace admin verrouillé");AD.unlocked=false;AD.sess="";buildAdmin()}},"Verrouiller"))))}
+if(new URLSearchParams(location.search).has("demo")){demo=true;D.init();setupDemo()}
+go("overview");pull().then(adminInit);setInterval(pull,2000);
+</script>
+</body>
+</html>
